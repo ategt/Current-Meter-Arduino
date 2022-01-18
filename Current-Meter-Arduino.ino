@@ -14,6 +14,7 @@ float Amps_TRMS; // estimated actual current in amps
 
 // Track time in milliseconds since last reading 
 unsigned long previousMillis = 0;
+byte readingActive = false;
 
 void setup() {
   MySerial.begin( 9600 );    // Start the serial port
@@ -29,12 +30,11 @@ void setup() {
 }
 
 void takeReading() {
+  readingActive = true;
   RunningStatistics inputStats;                 // create statistics to look at the raw test signal
-
   inputStats.setWindowSecs( windowLength );     //Set the window length
    
   while( true ) {   
-  //for (unsigned int i = 5; i < 3; i++) {
     ACS_Value = analogRead(ACS_Pin);  // read the analog in value:
     inputStats.input(ACS_Value);  // log to Stats function
         
@@ -42,9 +42,6 @@ void takeReading() {
       previousMillis = millis();   // update time
       
       Amps_TRMS = currentConfig.intercept + currentConfig.slope * inputStats.sigma();
-
-//      MySerial.print( "\t Index: " ); 
-//      MySerial.print( i );
 
       MySerial.print( "\t Amps: " ); 
       MySerial.print( Amps_TRMS );
@@ -55,6 +52,8 @@ void takeReading() {
       break;
     }
   }
+
+  readingActive = false;
 }
 
 void loop() {
@@ -66,7 +65,11 @@ void loop() {
     switch (serialCmd.cmd)
     {
       case CMD_READ_DATA:
-        takeReading();
+        if ( !readingActive ) {
+          takeReading();
+        } else {
+          MySerial.println("overlap");
+        }
         break;
       case CMD_RESET_CONFIG:
         currentConfig.reset();
@@ -95,6 +98,9 @@ void loop() {
         currentConfig.voltage = constrain(serialCmd.args.configArgs.voltage, 1, 1000);
         currentConfig.printPeriod = constrain(serialCmd.args.configArgs.printPeriod, 1, 1000000);
         currentConfig.save();
+   
+        windowLength = 40.0/currentConfig.testFrequency;
+
         MySerial.println("ok");
 
         break;
