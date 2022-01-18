@@ -30,25 +30,68 @@ void setup() {
 
 void loop() {
   serialCmd.serialEvent();
-
   RunningStatistics inputStats;                 // create statistics to look at the raw test signal
-  inputStats.setWindowSecs( windowLength );     //Set the window length
-   
-  while( true ) {   
-    ACS_Value = analogRead(ACS_Pin);  // read the analog in value:
-    inputStats.input(ACS_Value);  // log to Stats function
-        
-    if((unsigned long)(millis() - previousMillis) >= currentConfig.printPeriod) { //every second we do the calculation
-      previousMillis = millis();   // update time
+
+  // Process serial commands.
+  if (serialCmd.complete)
+  {
+    switch (serialCmd.cmd)
+    {
+      case CMD_READ_DATA:
+        inputStats.setWindowSecs( windowLength );     //Set the window length
+         
+        while( true ) {   
+          ACS_Value = analogRead(ACS_Pin);  // read the analog in value:
+          inputStats.input(ACS_Value);  // log to Stats function
+              
+          if((unsigned long)(millis() - previousMillis) >= currentConfig.printPeriod) { //every second we do the calculation
+            previousMillis = millis();   // update time
+            
+            Amps_TRMS = currentConfig.intercept + currentConfig.slope * inputStats.sigma();
       
-      Amps_TRMS = currentConfig.intercept + currentConfig.slope * inputStats.sigma();
+            MySerial.print( "\t Amps: " ); 
+            MySerial.print( Amps_TRMS );
+      
+            MySerial.print( "\t Watts: " ); 
+            MySerial.println( Amps_TRMS * currentConfig.voltage );
+          }
+        }
+        break;
+      case CMD_RESET_CONFIG:
+        currentConfig.reset();
+        currentConfig.save();
 
-      Serial.print( "\t Amps: " ); 
-      Serial.print( Amps_TRMS );
+        windowLength = 40.0/currentConfig.testFrequency;
 
-      Serial.print( "\t Watts: " ); 
-      Serial.println( Amps_TRMS * currentConfig.voltage );
+        MySerial.println("ok");
+        break;
+      case CMD_READ_CONFIG:
+        MySerial.print(currentConfig.testFrequency);
+        MySerial.print(",");
+        MySerial.println(currentConfig.intercept);
+        MySerial.print(",");
+        MySerial.println(currentConfig.slope);
+        MySerial.print(",");
+        MySerial.println(currentConfig.voltage);
+        MySerial.print(",");
+        MySerial.println(currentConfig.printPeriod);
+
+        break;
+      case CMD_WRITE_CONFIG:
+        currentConfig.testFrequency = constrain(serialCmd.args.configArgs.testFrequency, 1, 1000);
+        currentConfig.intercept = serialCmd.args.configArgs.intercept;
+        currentConfig.slope = serialCmd.args.configArgs.slope;
+        currentConfig.voltage = constrain(serialCmd.args.configArgs.voltage, 1, 1000);
+        currentConfig.printPeriod = constrain(serialCmd.args.configArgs.printPeriod, 1, 1000000);
+        currentConfig.save();
+        MySerial.println("ok");
+
+        break;
+      case CMD_ERR:
+        MySerial.println("err");
+        break;
     }
+    serialCmd.reset();
   }
 }
 
