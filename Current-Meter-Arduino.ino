@@ -33,7 +33,8 @@ void takeReading() {
 
   inputStats.setWindowSecs( windowLength );     //Set the window length
    
-  while( true ) {   
+  //while( true ) {   
+  for (unsigned int i = 0; i < 10; i++) {
     ACS_Value = analogRead(ACS_Pin);  // read the analog in value:
     inputStats.input(ACS_Value);  // log to Stats function
         
