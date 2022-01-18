@@ -33,8 +33,8 @@ void takeReading() {
 
   inputStats.setWindowSecs( windowLength );     //Set the window length
    
-  //while( true ) {   
-  for (unsigned int i = 0; i < 10; i++) {
+  while( true ) {   
+  //for (unsigned int i = 5; i < 3; i++) {
     ACS_Value = analogRead(ACS_Pin);  // read the analog in value:
     inputStats.input(ACS_Value);  // log to Stats function
         
@@ -43,11 +43,16 @@ void takeReading() {
       
       Amps_TRMS = currentConfig.intercept + currentConfig.slope * inputStats.sigma();
 
+//      MySerial.print( "\t Index: " ); 
+//      MySerial.print( i );
+
       MySerial.print( "\t Amps: " ); 
       MySerial.print( Amps_TRMS );
 
       MySerial.print( "\t Watts: " ); 
       MySerial.println( Amps_TRMS * currentConfig.voltage );
+
+      break;
     }
   }
 }
