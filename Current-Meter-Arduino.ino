@@ -1,8 +1,10 @@
 /* This code works with ACS712 current sensor, it permits the calculation of the signal TRMS
  * Visit www.surtrtech.com for more details
  */
-
 #include <Filters.h>                      //This library does a massive work check it's .cpp file
+
+#include "SerialCmd.h"
+#include "Config.h"
 
 #define ACS_Pin A0                        //Sensor data pin on A0 analog input
 
