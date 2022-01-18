@@ -53,18 +53,59 @@ void SerialCommand::serialEvent()
         // Parse arguments
         case CMD_WRITE_CONFIG:
           {
-            char *p_wheelDiameter, *p_speedLimit;
-            p_wheelDiameter = strtok(serialInputString, ",");
-            p_speedLimit = strtok((char *)0, "\r");   // "/r" not actually needed
+            char *p_testFrequency, *p_intercept, *p_slope, *p_voltage, *p_printPeriod;
+            char *token;
+            char *end;
+            unsigned int i = 0;
 
-            if (p_wheelDiameter == NULL || p_speedLimit == NULL)
+            token = strtok(serialInputString, ",");
+
+            while( token != NULL ) {
+              switch (cmd) {
+                case 0:
+                  {
+                    p_testFrequency = token;
+                  }
+                  break;
+                case 1:
+                  {
+                    p_intercept = token;
+                  }
+                  break;
+                case 2:
+                  {
+                    p_slope = token;
+                  }
+                  break;
+                case 3:
+                  {
+                    p_voltage = token;
+                  }
+                  break;
+                case 4:
+                  {
+                    p_printPeriod = token;
+                  }
+                  break;
+                default:
+                  break;
+              }
+
+              token = strtok(NULL, ",");
+              i++;
+            }
+
+            if (p_testFrequency == NULL || p_intercept == NULL || p_slope == NULL || p_voltage == NULL || p_printPeriod == NULL)
             {
               cmd = CMD_ERR;
             }
             else
             {
-              args.configArgs.wheelDiameterMm = atof(p_wheelDiameter) * 10;
-              args.configArgs.speedLimitKmh = atof(p_speedLimit);
+              args.configArgs.testFrequency = atof(p_testFrequency);
+              args.configArgs.intercept = atof(p_intercept);
+              args.configArgs.slope = atof(p_slope);
+              args.configArgs.voltage = atof(p_voltage);
+              args.configArgs.printPeriod = strtoul(p_printPeriod, &end, 10);
             }
           }
           break;
@@ -103,9 +144,9 @@ void SerialCommand::serialEvent()
       {
         cmd = CMD_READ_DATA;
       }
-      else if (strcmp("rstrip", serialInputString) == 0)
+      else if (strcmp("rstconf", serialInputString) == 0)
       {
-        cmd = CMD_RESET_TRIP;
+        cmd = CMD_RESET_CONFIG;
       }
       else if (strcmp("readconf", serialInputString) == 0)
       {

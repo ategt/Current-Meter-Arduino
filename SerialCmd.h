@@ -16,15 +16,18 @@ enum SerialCmdValues
 {
   CMD_ERR = 1,
   CMD_READ_DATA,
-  CMD_RESET_TRIP,
+  CMD_RESET_CONFIG,
   CMD_READ_CONFIG,
   CMD_WRITE_CONFIG
 };
 
 
 struct ConfigArgs {
-  unsigned int wheelDiameterMm;
-  float speedLimitKmh;
+  float testFrequency;    // test signal frequency (Hz)
+  float intercept;        // calibration base
+  float slope;            // calibration adjustment
+  float voltage;
+  unsigned long printPeriod; // in milliseconds
 };
 
 union SerialCommandArgs {

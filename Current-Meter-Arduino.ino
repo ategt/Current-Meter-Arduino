@@ -9,26 +9,28 @@
 #define ACS_Pin A0                        //Sensor data pin on A0 analog input
 
 float ACS_Value;                              //Here we keep the raw data valuess
-float testFrequency = 50;                    // test signal frequency (Hz)
-float windowLength = 40.0/testFrequency;     // how long to average the signal, for statistist
-
-float intercept = 0; // to be adjusted based on calibration testing
-float slope = 1; // to be adjusted based on calibration testing
-                      //Please check the ACS712 Tutorial video by SurtrTech to see how to get them because it depends on your sensor, or look below
-
+float windowLength;     // how long to average the signal, for statistist
 float Amps_TRMS; // estimated actual current in amps
-float voltage = 120;
 
-unsigned long printPeriod = 1000; // in milliseconds
 // Track time in milliseconds since last reading 
 unsigned long previousMillis = 0;
 
 void setup() {
-  Serial.begin( 9600 );    // Start the serial port
+  MySerial.begin( 9600 );    // Start the serial port
   pinMode(ACS_Pin,INPUT);  //Define the pin mode
+
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for native USB port only
+  }
+
+  currentConfig.load();
+
+  windowLength = 40.0/currentConfig.testFrequency;
 }
 
 void loop() {
+  serialCmd.serialEvent();
+
   RunningStatistics inputStats;                 // create statistics to look at the raw test signal
   inputStats.setWindowSecs( windowLength );     //Set the window length
    
@@ -36,16 +38,16 @@ void loop() {
     ACS_Value = analogRead(ACS_Pin);  // read the analog in value:
     inputStats.input(ACS_Value);  // log to Stats function
         
-    if((unsigned long)(millis() - previousMillis) >= printPeriod) { //every second we do the calculation
+    if((unsigned long)(millis() - previousMillis) >= currentConfig.printPeriod) { //every second we do the calculation
       previousMillis = millis();   // update time
       
-      Amps_TRMS = intercept + slope * inputStats.sigma();
+      Amps_TRMS = currentConfig.intercept + currentConfig.slope * inputStats.sigma();
 
       Serial.print( "\t Amps: " ); 
       Serial.print( Amps_TRMS );
 
       Serial.print( "\t Watts: " ); 
-      Serial.println( Amps_TRMS * voltage );
+      Serial.println( Amps_TRMS * currentConfig.voltage );
     }
   }
 }

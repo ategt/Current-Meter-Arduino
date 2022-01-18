@@ -1,26 +1,20 @@
 #include <avr/eeprom.h>
 
-const char nameAndVersion[] = "Android Speedometer V1.0";
+const char nameAndVersion[] = "Current Meter V1.0";
 
 struct Config {
   char appNameAndVersion[sizeof(nameAndVersion)];
   // Configuration parameters.
-  unsigned int wheelDiameterMm; // millimetres
-  float speedLimitKmh;   // trigger alarm if limit exceeded.
-
-  // Persistent variables.
-  unsigned long totalDistanceMetres;
-  unsigned long totalTimeSeconds;
-  unsigned long tripDistanceMetres;
-  unsigned long tripTimeSeconds;
-  float tripMaxSpeedKmh;
-
+  float testFrequency;    // test signal frequency (Hz)
+  float intercept;        // to be adjusted based on calibration testing
+  float slope;            // to be adjusted based on calibration testing
+  float voltage;
+  unsigned long printPeriod; // in milliseconds
 
   void save()
   {
     eeprom_write_block(this, (void *)0, sizeof (Config));
   }
-
 
   void load()
   {
@@ -39,11 +33,12 @@ struct Config {
   {
     memset(this, 0, sizeof (Config));
     strcpy(this->appNameAndVersion, nameAndVersion);
-    this->wheelDiameterMm = 600;  // millimetres
-    this->speedLimitKmh = 10;
-    this->tripMaxSpeedKmh = 0;
+    this->testFrequency = 50;
+    this->intercept = 0;
+    this->slope = 1;
+    this->voltage = 120;
+    this->printPeriod = 1000;
   }
 };
 
 Config currentConfig;
-
