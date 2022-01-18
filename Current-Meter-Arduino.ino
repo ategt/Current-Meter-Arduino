@@ -72,13 +72,13 @@ void loop() {
         MySerial.println("ok");
         break;
       case CMD_READ_CONFIG:
-        MySerial.print(currentConfig.testFrequency);
+        MySerial.print((unsigned int)currentConfig.testFrequency);
         MySerial.print(",");
-        MySerial.println(currentConfig.intercept);
+        MySerial.print(currentConfig.intercept);
         MySerial.print(",");
-        MySerial.println(currentConfig.slope);
+        MySerial.print(currentConfig.slope);
         MySerial.print(",");
-        MySerial.println(currentConfig.voltage);
+        MySerial.print((unsigned int)currentConfig.voltage);
         MySerial.print(",");
         MySerial.println(currentConfig.printPeriod);
 

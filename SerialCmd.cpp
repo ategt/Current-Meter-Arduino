@@ -61,7 +61,7 @@ void SerialCommand::serialEvent()
             token = strtok(serialInputString, ",");
 
             while( token != NULL ) {
-              switch (cmd) {
+              switch (i) {
                 case 0:
                   {
                     p_testFrequency = token;
