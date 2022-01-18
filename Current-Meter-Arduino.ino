@@ -28,9 +28,31 @@ void setup() {
   windowLength = 40.0/currentConfig.testFrequency;
 }
 
+void takeReading() {
+  RunningStatistics inputStats;                 // create statistics to look at the raw test signal
+
+  inputStats.setWindowSecs( windowLength );     //Set the window length
+   
+  while( true ) {   
+    ACS_Value = analogRead(ACS_Pin);  // read the analog in value:
+    inputStats.input(ACS_Value);  // log to Stats function
+        
+    if((unsigned long)(millis() - previousMillis) >= currentConfig.printPeriod) { //every second we do the calculation
+      previousMillis = millis();   // update time
+      
+      Amps_TRMS = currentConfig.intercept + currentConfig.slope * inputStats.sigma();
+
+      MySerial.print( "\t Amps: " ); 
+      MySerial.print( Amps_TRMS );
+
+      MySerial.print( "\t Watts: " ); 
+      MySerial.println( Amps_TRMS * currentConfig.voltage );
+    }
+  }
+}
+
 void loop() {
   serialCmd.serialEvent();
-  RunningStatistics inputStats;                 // create statistics to look at the raw test signal
 
   // Process serial commands.
   if (serialCmd.complete)
@@ -38,24 +60,7 @@ void loop() {
     switch (serialCmd.cmd)
     {
       case CMD_READ_DATA:
-        inputStats.setWindowSecs( windowLength );     //Set the window length
-         
-        while( true ) {   
-          ACS_Value = analogRead(ACS_Pin);  // read the analog in value:
-          inputStats.input(ACS_Value);  // log to Stats function
-              
-          if((unsigned long)(millis() - previousMillis) >= currentConfig.printPeriod) { //every second we do the calculation
-            previousMillis = millis();   // update time
-            
-            Amps_TRMS = currentConfig.intercept + currentConfig.slope * inputStats.sigma();
-      
-            MySerial.print( "\t Amps: " ); 
-            MySerial.print( Amps_TRMS );
-      
-            MySerial.print( "\t Watts: " ); 
-            MySerial.println( Amps_TRMS * currentConfig.voltage );
-          }
-        }
+        takeReading();
         break;
       case CMD_RESET_CONFIG:
         currentConfig.reset();
