@@ -11,6 +11,7 @@
 float ACS_Value;                              //Here we keep the raw data valuess
 float windowLength;     // how long to average the signal, for statistist
 float Amps_TRMS; // estimated actual current in amps
+float adjusted_amps_TRMS;
 
 // Track time in milliseconds since last reading 
 unsigned long previousMillis = 0;
@@ -33,21 +34,35 @@ void takeReading() {
   readingActive = true;
   RunningStatistics inputStats;                 // create statistics to look at the raw test signal
   inputStats.setWindowSecs( windowLength );     //Set the window length
-   
-  while( true ) {   
-    ACS_Value = analogRead(ACS_Pin);  // read the analog in value:
+
+  unsigned int readingCount = 100;
+  unsigned long cum = 0;
+
+  while( true ) {
+    cum = 0;
+
+    for (int x = 0; x < readingCount; x = x + 1) {
+        cum += analogRead(ACS_Pin);
+    }
+     
+    ACS_Value = cum/readingCount;  // read the analog in value:
     inputStats.input(ACS_Value);  // log to Stats function
         
     if((unsigned long)(millis() - previousMillis) >= currentConfig.printPeriod) { //every second we do the calculation
       previousMillis = millis();   // update time
       
-      Amps_TRMS = currentConfig.intercept + currentConfig.slope * inputStats.sigma();
+      //Amps_TRMS = (currentConfig.slope * inputStats.sigma()) + currentConfig.intercept;
+      Amps_TRMS = inputStats.sigma();
+      adjusted_amps_TRMS = (Amps_TRMS + currentConfig.intercept) * currentConfig.slope;
 
-      MySerial.print( "\t Amps: " ); 
+      MySerial.print( "\t Reading: " ); 
       MySerial.print( Amps_TRMS );
 
+      MySerial.print( "\t Amps: " ); 
+      MySerial.print( adjusted_amps_TRMS );
+
       MySerial.print( "\t Watts: " ); 
-      MySerial.println( Amps_TRMS * currentConfig.voltage );
+      MySerial.println( adjusted_amps_TRMS * currentConfig.voltage );
 
       break;
     }
