@@ -126,8 +126,6 @@ void loop() {
 
         break;
       case CMD_READ_DELAY:
-        MySerial.println("READ DELAY CMD RECIEVED");
-
         if((unsigned long)(millis() - previousMillis) < currentConfig.printPeriod) {
           MySerial.print("...pausing for ");
           MySerial.print(currentConfig.printPeriod - ((unsigned long)(millis() - previousMillis)));
