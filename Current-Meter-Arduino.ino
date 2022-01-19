@@ -109,6 +109,36 @@ void loop() {
         MySerial.println("ok");
 
         break;
+      case CMD_READ_RAW:
+        MySerial.print(millis());
+        MySerial.print(",");
+
+        for ( unsigned int i = 0; i < currentConfig.printPeriod ; i++ ) {
+          MySerial.print(analogRead(ACS_Pin));
+          MySerial.print(",");
+        }
+
+        MySerial.print(analogRead(ACS_Pin));
+        MySerial.print(",");
+        MySerial.println(millis());
+
+        break;
+      case CMD_READ_DELAY:
+        if((unsigned long)(millis() - previousMillis) < currentConfig.printPeriod) {
+          MySerial.print("...pausing for ");
+          MySerial.print((unsigned long)(millis() - previousMillis));
+          MySerial.println(" milliseconds");
+
+          delay((unsigned long)(millis() - previousMillis));
+        }
+        
+        MySerial.print(millis());
+        MySerial.print(",");
+        MySerial.println(analogRead(ACS_Pin));
+
+        previousMillis = millis();
+
+        break;
       case CMD_ERR:
         MySerial.println("err");
         break;

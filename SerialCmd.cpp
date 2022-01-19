@@ -51,6 +51,23 @@ void SerialCommand::serialEvent()
       switch (cmd)
       {
         // Parse arguments
+//        case CMD_READ_RAW:
+//          {
+//            char *p_limit, *p_notUsed;
+//            p_limit = strtok(serialInputString, ",");
+//            p_notUsed = strtok((char *)0, "\r");   // "/r" not actually needed
+//
+//            if (p_wheelDiameter == NULL || p_speedLimit == NULL)
+//            {
+//              cmd = CMD_ERR;
+//            }
+//            else
+//            {
+//              args.configArgs.wheelDiameterMm = atof(p_wheelDiameter) * 10;
+//              args.configArgs.speedLimitKmh = atof(p_speedLimit);
+//            }
+//          }
+//          break;
         case CMD_WRITE_CONFIG:
           {
             char *p_testFrequency, *p_intercept, *p_slope, *p_voltage, *p_printPeriod;
@@ -151,6 +168,14 @@ void SerialCommand::serialEvent()
       else if (strcmp("readconf", serialInputString) == 0)
       {
         cmd = CMD_READ_CONFIG;
+      }
+      else if (strcmp("readraw", serialInputString) == 0)
+      {
+        cmd = CMD_READ_RAW;
+      }
+      else if (strcmp("readdelay", serialInputString) == 0)
+      {
+        cmd = CMD_READ_DELAY;
       }
       else
       {
