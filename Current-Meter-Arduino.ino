@@ -33,25 +33,15 @@ void setup() {
 void takeReading() {
   readingActive = true;
   RunningStatistics inputStats;                 // create statistics to look at the raw test signal
-  inputStats.setWindowSecs( windowLength );     //Set the window length
-
-  unsigned int readingCount = 100;
-  unsigned long cum = 0;
+  inputStats.setWindowSecs( currentConfig.printPeriod / 1000 );     //Set the window length
 
   while( true ) {
-    cum = 0;
-
-    for (int x = 0; x < readingCount; x = x + 1) {
-        cum += analogRead(ACS_Pin);
-    }
-     
-    ACS_Value = cum/readingCount;  // read the analog in value:
+    ACS_Value = analogRead(ACS_Pin);  // read the analog in value:
     inputStats.input(ACS_Value);  // log to Stats function
         
     if((unsigned long)(millis() - previousMillis) >= currentConfig.printPeriod) { //every second we do the calculation
       previousMillis = millis();   // update time
       
-      //Amps_TRMS = (currentConfig.slope * inputStats.sigma()) + currentConfig.intercept;
       Amps_TRMS = inputStats.sigma();
       adjusted_amps_TRMS = (Amps_TRMS + currentConfig.intercept) * currentConfig.slope;
 
