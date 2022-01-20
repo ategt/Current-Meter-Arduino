@@ -1,6 +1,6 @@
 #include <Filters.h>
 
-float testFrequency = 2;                     // test signal frequency (Hz)
+float testFrequency = 60;                     // test signal frequency (Hz)
 float testAmplitude = 100;                   // test signal amplitude
 float testOffset = 100;
 
@@ -17,7 +17,7 @@ float time() {
 }
 
 void setup() {
-  Serial.begin( 9600 );    // start the serial port
+  Serial.begin( 57600 );    // start the serial port
 }
 
 void testOnePoleFilters() {
@@ -147,7 +147,19 @@ void testTwoPoleFilters() {
   }
 }
 
+void testSignalGenerator() {
+  float startTime = time();
+  float nextPrintTime = time();
+  
+  while( true ) {
+    // update all real time classes
+    float inputValue = testAmplitude + testAmplitude*sin( TWO_PI * testFrequency * time() );
+    Serial.println( inputValue );
+  }
+}
+
 void loop() {
   //testOnePoleFilters();
-  testTwoPoleFilters();
+  //testTwoPoleFilters();
+  testSignalGenerator();
 }
