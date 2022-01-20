@@ -1,8 +1,9 @@
 #include <Filters.h>
 
 float testFrequency = 60;                     // test signal frequency (Hz)
-float testAmplitude = 100;                   // test signal amplitude
+float testAmplitude = 350;                   // test signal amplitude
 float testOffset = 100;
+float testBaseLine = 509;                    // reading when test is at zero
 
 float windowLength = 20.0/testFrequency;     // how long to average the signal, for statistist
 
@@ -147,13 +148,17 @@ void testTwoPoleFilters() {
   }
 }
 
+float signalGenerator() {
+  return testBaseLine + testAmplitude*sin( TWO_PI * testFrequency * time() );
+}
+
 void testSignalGenerator() {
   float startTime = time();
   float nextPrintTime = time();
   
   while( true ) {
     // update all real time classes
-    float inputValue = testAmplitude + testAmplitude*sin( TWO_PI * testFrequency * time() );
+    float inputValue = signalGenerator();
     Serial.println( inputValue );
   }
 }
