@@ -29,7 +29,6 @@ struct Config {
     }
   }
 
-
   void reset()
   {
     memset(this, 0, sizeof (Config));

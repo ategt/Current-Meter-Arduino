@@ -56,7 +56,7 @@ void takeReading() {
       MySerial.print( "\t Adjusted: " ); 
       MySerial.print( Amps_TRMS + currentConfig.intercept );
 
-      MySerial.print( "\t Amps: " ); 
+      MySerial.print( "\t Amps: " );
       MySerial.print( Amps_VPP * currentConfig.slope );
 
       MySerial.print( "\t Watts: " ); 
@@ -77,7 +77,6 @@ void loop() {
     {
       case CMD_READ_DATA:
         takeReading();
-        MySerial.println("ok");
         break;
       case CMD_RESET_CONFIG:
         currentConfig.reset();
@@ -124,8 +123,6 @@ void loop() {
         MySerial.print(",");
         MySerial.println(millis());
 
-        MySerial.println("ok");
-
         break;
       case CMD_READ_DELAY:
         if((unsigned long)(millis() - previousMillis) < currentConfig.printPeriod) {
@@ -141,8 +138,6 @@ void loop() {
         MySerial.println(analogRead(ACS_Pin));
 
         previousMillis = millis();
-
-        MySerial.println("ok");
 
         break;
       case CMD_ERR:
