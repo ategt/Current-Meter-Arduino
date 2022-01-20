@@ -53,7 +53,7 @@ void SerialCommand::serialEvent()
         // Parse arguments
         case CMD_WRITE_CONFIG:
           {
-            char *p_testFrequency, *p_intercept, *p_slope, *p_voltage, *p_printPeriod;
+            char *p_testFrequency, *p_intercept, *p_slope, *p_voltage, *p_windowLength, *p_printPeriod;
             char *token;
             char *end;
             unsigned int i = 0;
@@ -84,6 +84,10 @@ void SerialCommand::serialEvent()
                   break;
                 case 4:
                   {
+                    p_windowLength = token;
+                  }
+                case 5:
+                  {
                     p_printPeriod = token;
                   }
                   break;
@@ -95,7 +99,7 @@ void SerialCommand::serialEvent()
               i++;
             }
 
-            if (p_testFrequency == NULL || p_intercept == NULL || p_slope == NULL || p_voltage == NULL || p_printPeriod == NULL)
+            if (p_testFrequency == NULL || p_intercept == NULL || p_slope == NULL || p_voltage == NULL || p_windowLength == NULL || p_printPeriod == NULL)
             {
               cmd = CMD_ERR;
             }
@@ -105,6 +109,7 @@ void SerialCommand::serialEvent()
               args.configArgs.intercept = atof(p_intercept);
               args.configArgs.slope = atof(p_slope);
               args.configArgs.voltage = atof(p_voltage);
+              args.configArgs.windowLength = atof(p_windowLength);
               args.configArgs.printPeriod = strtoul(p_printPeriod, &end, 10);
             }
           }

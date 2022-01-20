@@ -29,6 +29,7 @@ struct ConfigArgs {
   float intercept;        // calibration base
   float slope;            // calibration adjustment
   float voltage;
+  float windowLength;     // noise reduction analysis uses this (in seconds)
   unsigned long printPeriod; // in milliseconds
 };
 

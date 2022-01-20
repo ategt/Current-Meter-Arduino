@@ -9,6 +9,7 @@ struct Config {
   float intercept;        // to be adjusted based on calibration testing
   float slope;            // to be adjusted based on calibration testing
   float voltage;
+  float windowLength;     // used in noise reduction formula
   unsigned long printPeriod; // in milliseconds
 
   void save()
@@ -37,6 +38,7 @@ struct Config {
     this->intercept = 0;
     this->slope = 1;
     this->voltage = 120;
+    this->windowLength = 1;
     this->printPeriod = 1000;
   }
 };
