@@ -19,6 +19,9 @@ float time() {
 
 void setup() {
   Serial.begin( 57600 );    // start the serial port
+  delay(500);
+  Serial.print("\n\nUsing a Window of ");
+  Serial.println( windowLength );
 }
 
 void testOnePoleFilters() {
@@ -39,7 +42,7 @@ void testOnePoleFilters() {
   
   while( true ) {
     // update all real time classes
-    float inputValue = testAmplitude + testAmplitude*sin( TWO_PI * testFrequency * time() );
+    float inputValue = signalGenerator();
 
     // update the test value statistics
     inputStats.input( inputValue);
@@ -107,7 +110,7 @@ void testTwoPoleFilters() {
   
   while( true ) {
     // update all real time classes
-    float inputValue = testAmplitude + testAmplitude*sin( TWO_PI * testFrequency * time() );
+    float inputValue = signalGenerator();
         
     // update the test value statistics
     inputStats.input( inputValue);
@@ -153,11 +156,7 @@ float signalGenerator() {
 }
 
 void testSignalGenerator() {
-  float startTime = time();
-  float nextPrintTime = time();
-  
   while( true ) {
-    // update all real time classes
     float inputValue = signalGenerator();
     Serial.println( inputValue );
   }
@@ -165,6 +164,6 @@ void testSignalGenerator() {
 
 void loop() {
   //testOnePoleFilters();
-  //testTwoPoleFilters();
-  testSignalGenerator();
+  testTwoPoleFilters();
+  //testSignalGenerator();
 }
