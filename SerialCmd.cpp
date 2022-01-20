@@ -63,33 +63,22 @@ void SerialCommand::serialEvent()
             while( token != NULL ) {
               switch (i) {
                 case 0:
-                  {
-                    p_testFrequency = token;
-                  }
+                  p_testFrequency = token;
                   break;
                 case 1:
-                  {
-                    p_intercept = token;
-                  }
+                  p_intercept = token;
                   break;
                 case 2:
-                  {
-                    p_slope = token;
-                  }
+                  p_slope = token;
                   break;
                 case 3:
-                  {
-                    p_voltage = token;
-                  }
+                  p_voltage = token;
                   break;
                 case 4:
-                  {
-                    p_windowLength = token;
-                  }
+                  p_windowLength = token;
+                  break;
                 case 5:
-                  {
-                    p_printPeriod = token;
-                  }
+                  p_printPeriod = token;
                   break;
                 default:
                   break;

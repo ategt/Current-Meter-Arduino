@@ -8,20 +8,16 @@
 
 #define ACS_Pin A0                        //Sensor data pin on A0 analog input
 
-float ACS_Value;                              //Here we keep the raw data valuess
-//float windowLength;     // how long to average the signal, for statistist
-float Amps_TRMS; // estimated actual current in amps
-//float adjusted_amps_TRMS;
+float ACS_Value;                          //Here we keep the raw data valuess
+float Amps_TRMS;                          // estimated actual current in amps
 float Amps_VPP;
 
 // Track time in milliseconds since last reading 
 unsigned long previousMillis = 0;
-//float startTime = time();
 float printTime;
-byte readingActive = false;
 
 void setup() {
-  MySerial.begin( 57600 );    // Start the serial port
+  MySerial.begin( 9600 );    // Start the serial port
   pinMode(ACS_Pin,INPUT);  //Define the pin mode
 
   while (!Serial) {
@@ -41,7 +37,6 @@ float ampsAcToDc( float acAmps ) {
 }
 
 void takeReading() {
-  readingActive = true;
   printTime = time() + (currentConfig.printPeriod/1000);
   RunningStatistics inputStats;                 // create statistics to look at the raw test signal
   inputStats.setWindowSecs( currentConfig.windowLength );     //Set the window length
@@ -70,8 +65,6 @@ void takeReading() {
       break;
     }
   }
-
-  readingActive = false;
 }
 
 void loop() {
@@ -83,12 +76,8 @@ void loop() {
     switch (serialCmd.cmd)
     {
       case CMD_READ_DATA:
-        if ( !readingActive ) {
-          takeReading();
-          MySerial.println("ok");
-        } else {
-          MySerial.println("overlap");
-        }
+        takeReading();
+        MySerial.println("ok");
         break;
       case CMD_RESET_CONFIG:
         currentConfig.reset();
