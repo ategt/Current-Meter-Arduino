@@ -6,7 +6,8 @@
 #include "SerialCmd.h"
 #include "Config.h"
 
-#define ACS_Pin A0                        //Sensor data pin on A0 analog input
+#define ACS_Pin A2                        //Sensor data pin on A0 analog input
+#define TEMP_Pin A3
 
 float ACS_Value;                          //Here we keep the raw data valuess
 float Amps_TRMS;                          // estimated actual current in amps
@@ -60,7 +61,7 @@ void takeReading() {
       MySerial.print( Amps_VPP * currentConfig.slope );
 
       MySerial.print( "\t Watts: " ); 
-      MySerial.println( Amps_VPP * currentConfig.voltage * currentConfig.slope );
+      MySerial.print( Amps_VPP * currentConfig.voltage * currentConfig.slope );
 
       break;
     }
@@ -68,21 +69,19 @@ void takeReading() {
 }
 
 void takeTemp() {
-  // read the input on analog pin 0:
-  unsigned int sensorValue = analogRead(A2);
+  unsigned int sensorValue = analogRead(TEMP_Pin);
   unsigned int readingCount = 100;
 
-  // print out the value you read:
   Serial.print(sensorValue);
   Serial.print(",");
 
   unsigned long cum = 0;
 
   for (int x = 0; x < readingCount; x = x + 1) {
-      cum += analogRead(A2);
+      cum += analogRead(TEMP_Pin);
   }
   
-  Serial.println(cum/readingCount);
+  Serial.print(cum/readingCount);
 }
 
 void loop() {
@@ -95,7 +94,9 @@ void loop() {
     {
       case CMD_READ_DATA:
         takeReading();
+        MySerial.print(",");
         takeTemp();
+        MySerial.println("");
         break;
       case CMD_RESET_CONFIG:
         currentConfig.reset();
