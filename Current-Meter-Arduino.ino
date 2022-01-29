@@ -67,6 +67,24 @@ void takeReading() {
   }
 }
 
+void takeTemp() {
+  // read the input on analog pin 0:
+  unsigned int sensorValue = analogRead(A2);
+  unsigned int readingCount = 100;
+
+  // print out the value you read:
+  Serial.print(sensorValue);
+  Serial.print(",");
+
+  unsigned long cum = 0;
+
+  for (int x = 0; x < readingCount; x = x + 1) {
+      cum += analogRead(A2);
+  }
+  
+  Serial.println(cum/readingCount);
+}
+
 void loop() {
   serialCmd.serialEvent();
 
@@ -77,6 +95,7 @@ void loop() {
     {
       case CMD_READ_DATA:
         takeReading();
+        takeTemp();
         break;
       case CMD_RESET_CONFIG:
         currentConfig.reset();
