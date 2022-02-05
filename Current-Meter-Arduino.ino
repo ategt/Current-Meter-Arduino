@@ -8,6 +8,7 @@
 
 #define ACS_Pin A2                        //Sensor data pin on A0 analog input
 #define TEMP_Pin A3
+#define TEMP_Diode_Pin A0
 
 float ACS_Value;                          //Here we keep the raw data valuess
 float Amps_TRMS;                          // estimated actual current in amps
@@ -84,6 +85,22 @@ void takeTemp() {
   Serial.print(cum/readingCount);
 }
 
+void takeDiodeTemp() {
+  unsigned int sensorValue = analogRead(TEMP_Diode_Pin);
+  unsigned int readingCount = 100;
+
+  Serial.print(sensorValue);
+  Serial.print(",");
+
+  unsigned long cum = 0;
+
+  for (int x = 0; x < readingCount; x = x + 1) {
+      cum += analogRead(TEMP_Diode_Pin);
+  }
+  
+  Serial.print(cum/readingCount);
+}
+
 void loop() {
   serialCmd.serialEvent();
 
@@ -96,6 +113,8 @@ void loop() {
         takeReading();
         MySerial.print(",");
         takeTemp();
+        MySerial.print(",");
+        takeDiodeTemp();
         MySerial.println("");
         break;
       case CMD_RESET_CONFIG:
