@@ -8,6 +8,7 @@
 
 #define ACS_Pin A2                        //Sensor data pin on A0 analog input
 #define TEMP_Pin A3
+#define FRIGE_Pin A4
 #define TEMP_Diode_Pin A0
 
 float ACS_Value;                          //Here we keep the raw data valuess
@@ -101,6 +102,22 @@ void takeDiodeTemp() {
   Serial.print(cum/readingCount);
 }
 
+void takeFrigeDiodeTemp() {
+  unsigned int sensorValue = analogRead(FRIGE_Pin);
+  unsigned int readingCount = 100;
+
+  Serial.print(sensorValue);
+  Serial.print(",");
+
+  unsigned long cum = 0;
+
+  for (int x = 0; x < readingCount; x = x + 1) {
+      cum += analogRead(FRIGE_Pin);
+  }
+  
+  Serial.print(cum/readingCount);
+}
+
 void loop() {
   serialCmd.serialEvent();
 
@@ -115,6 +132,8 @@ void loop() {
         takeTemp();
         MySerial.print(",");
         takeDiodeTemp();
+        MySerial.print(",");
+        takeFrigeDiodeTemp();
         MySerial.println("");
         break;
       case CMD_RESET_CONFIG:
